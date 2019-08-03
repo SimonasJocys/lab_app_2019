@@ -1,4 +1,4 @@
-import numpy as np
+#import numpy as np
 import glob
 
 from kivy.app import App
