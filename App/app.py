@@ -1,6 +1,7 @@
 import numpy as np
 from glob import glob
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+import matplotlib 
 from skimage.morphology import remove_small_objects, label
 import cv2
 from array import array
@@ -21,8 +22,6 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, RiseInTransition
 from kivy.graphics.texture import Texture
-
-from kivy.core.image import Image as II
 
 from kivy.clock import Clock
 from functools import partial
@@ -48,7 +47,7 @@ Builder.load_string('''
     BoxLayout:
         orientation: 'vertical'
         Image_btn:
-            source: 'img/logo.png'
+            source: 'img/Logo.png'
             allow_stretch: True
             on_press: root.manager.current = 'menu'
 
@@ -157,8 +156,8 @@ Builder.load_string('''
                 root.count_cells()
                 root.manager.current = 'count'
                 root.manager.get_screen('count').ids.img_confocal.source = root.img
-                # root.manager.get_screen('count').ids.img_count.canvas\
-                #     .get_group('c')[0].texture = root.texture
+                root.manager.get_screen('count').ids.img_count.canvas\
+                    .get_group('c')[0].texture = root.texture
                 root.manager.get_screen('count').ids.number.text = \
                     'Number of \\nCells: {}'.format(root.N)
             border: 0,0,0,0
@@ -169,7 +168,7 @@ Builder.load_string('''
 # background color
     canvas.before:
         Color:
-            rgba: 1, 0, 1, 0.85
+            rgba: 1, 1, 1, 0.85
         Rectangle:
             pos: self.pos
             size: self.size
@@ -186,14 +185,13 @@ Builder.load_string('''
                 id: img_confocal
                 allow_stretch: False
 # Counted Image
-            FullImage: 
+            Image: 
                 id: img_count
                 canvas:
                     Rectangle:
                         group: 'c'
                         pos: self.pos
-                        texture: root.make_img()
-                        size: root.size
+                        size: self.size
 # Buttons
         BoxLayout:
             orientation: 'vertical'
@@ -219,7 +217,9 @@ Builder.load_string('''
                 background_normal: 'img/btn_black.png'
                 background_down: 'img/btn_press.png'
                 background_disabled_normal: 'img/btn_dis.png'
-                on_press: root.manager.current = 'part1'
+                on_press: 
+                    root.chech()
+                    root.manager.current = 'part1'
                 border: 0,0,0,0
                 color: 1,1,1,1
             Button:
@@ -293,9 +293,6 @@ Builder.load_string('''
 # ----------------------------------------------------------------------------
 ''')
 
-class FullImage(Image):
-    pass
-
 # new widget: image with button behavior
 class Image_btn(ButtonBehavior, Image):
     pass
@@ -345,25 +342,32 @@ class Container1(Screen):
         labeled = label(clean_cell_bw, background=0)
         self.N = np.max(labeled)
         # create image 
-        # texture = Texture.create(size=labeled.shape)
-        # labeled = cv2.imread(self.img)
-        # buf = np.reshape(labeled, -1)
-        # arr = array('B', buf)
-        # self.texture = texture.blit_buffer(arr, colorfmt='rgb', bufferfmt='ubyte')
+        my_cm = matplotlib.cm.get_cmap('nipy_spectral')
+        normed_data = (labeled - np.min(labeled)) / (np.max(labeled) - np.min(labeled))
+        mapped_data = (255 * my_cm(normed_data)).astype('uint8')
+        image = np.rot90(np.swapaxes(mapped_data, 0, 1))
+        self.texture = Texture.create(size=(image.shape[1], image.shape[0]), colorfmt='rgba')
+        self.texture.blit_buffer(image.tostring(), colorfmt='rgba', bufferfmt='ubyte')
 
 class Count_screen(Screen):
-    def make_img(self):
-        # create image 
-        self.img = np.random.choice(App.get_running_app().confocal)
-        labeled = cv2.imread(self.img)
-        texture = Texture.create(size=labeled.shape[:2])
-        # buf = np.reshape(labeled, -1)
-        # arr = array('B', buf)
-        # self.texture = texture.blit_buffer(arr, colorfmt='rgb', bufferfmt='ubyte')
-        # self.size = labeled.shape[:2]
-        data = labeled.ravel()
-        self.texture = texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
-        return self.texture
+    def chech(self):
+        print(self.ids.img_confocal.size)
+        print(self.ids.img_count.size)
+    # def make_img(self):
+    #     # create image 
+    #     self.img = np.random.choice(App.get_running_app().confocal)
+    #     labeled = cv2.imread(self.img)
+    #     image = np.rot90(np.swapaxes(labeled, 0, 1))
+    #     self.texture = Texture.create(size=(image.shape[1], image.shape[0]), colorfmt='rgb')
+    #     self.texture.blit_buffer(image.tostring(), colorfmt='bgr', bufferfmt='ubyte')
+    #     # texture = Texture.create(size=labeled.shape[:2])
+    #     # # buf = np.reshape(labeled, -1)
+    #     # # arr = array('B', buf)
+    #     # # self.texture = texture.blit_buffer(arr, colorfmt='rgb', bufferfmt='ubyte')
+    #     # # self.size = labeled.shape[:2]
+    #     # data = labeled.ravel()
+    #     # self.texture = texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
+    #     return self.texture
 # ----------------------------------------------------------------------------
 
 # ---------------------------------- Part 2 ----------------------------------
@@ -380,17 +384,16 @@ class Container3(Screen):
 class MainApp(App):
     confocal = glob('data/confocal/*')
     light = glob('data/light/*')
-    print(confocal)
 # screen manager
     sm = ScreenManager()
 # build app
     def build(self):
-        self.title = 'App title'
+        self.title = 'Cell Counter'
         self.icon = 'img/Logo.png'
-        # MainApp.sm.add_widget(Container1(name='part1'))
+        MainApp.sm.add_widget(Container1(name='part1'))
         MainApp.sm.add_widget(Logo(name='logo'))
         MainApp.sm.add_widget(Menu(name='menu'))
-        MainApp.sm.add_widget(Container1(name='part1'))
+        # MainApp.sm.add_widget(Container1(name='part1'))
         MainApp.sm.add_widget(Count_screen(name='count'))
         MainApp.sm.add_widget(Container2(name='part2'))
         MainApp.sm.add_widget(Container3(name='part3'))
