@@ -454,19 +454,21 @@ class Container2(Screen):
         self.img = np.random.choice(App.get_running_app().light)
         return self.img
 
-    def clip(self, x): 
-        '''Clip maximum to 4 sigma'''
+    def clip(x): 
+        '''
+        Clip maximum to 4 sigma
+        '''
         return np.clip(x, a_min=0, a_max=6*np.std(x))
 
-    def norm(self, x): 
-        x = self.clip(x)
+    def norm(x): 
+        x = clip(x)
         return (x) / ( np.max(x)) # clip at 6-sigma ?
 
-    def binary_mask(self, x, treshold=None, sigmas = 2):
-        if treshold is None:
-            return self.norm(x) > sigmas*np.std(self.norm(x))
+    def binary_mask(x, treshold=None, sigmas = 2):
+        if treshold:
+            return norm(x) > treshold
         else:
-            return self.norm(x) > treshold
+            return norm(x) > sigmas*np.std(norm(x))
 
     def count_cells(self):
         cell = np.asarray(cv2.imread(self.img)[:,:,0], dtype=np.float32)
@@ -474,7 +476,11 @@ class Container2(Screen):
         min_size = 16 # 16 px area is minimal
         # Binary tresholded image
         clean_cell_bw = remove_small_objects(
-                    self.binary_mask(cell, binary_treshold), min_size = min_size)
+                    binary_mask(cell, threshold=binary_treshold),
+                    min_size=min_size
+                )
+        # 
+        # clean_cell_bw = remove_small_objects(binary_mask(cell), min_size = min_size)
         # count cells
         labeled = label(clean_cell_bw, background=0)
         self.N = np.max(labeled)
