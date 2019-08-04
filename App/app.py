@@ -81,7 +81,7 @@ Builder.load_string('''
 # Button for ...
         Button:
             size_hint_y: 0.5
-            text: '...'
+            text: 'Anomaly detection'
             on_press: root.manager.current = 'part3'
             background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
@@ -92,7 +92,7 @@ Builder.load_string('''
 # Button for ...
         Button:
             size_hint_y: 0.5
-            text: '...'
+            text: 'Sholl analysis'
             on_press: root.manager.current = 'part3'
             background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
@@ -103,7 +103,7 @@ Builder.load_string('''
 # Button for ...
         Button:
             size_hint_y: 0.5
-            text: '...'
+            text: 'Cell size histogram'
             on_press: root.manager.current = 'part3'
             background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
