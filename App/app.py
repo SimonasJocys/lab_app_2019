@@ -44,11 +44,18 @@ Builder.load_string('''
 
 # ----------------------------------- LOGO -----------------------------------
 <Logo>:
+# background color
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 # Label: welcome
     BoxLayout:
         orientation: 'vertical'
         Image_btn:
-            source: 'img/Logo.png'
+            source: 'img/logo.png'
             allow_stretch: True
             on_press: root.manager.current = 'menu'
 
@@ -57,7 +64,7 @@ Builder.load_string('''
 # background color
     canvas.before:
         Color:
-            rgba: 1, 1, 1, .1
+            rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
@@ -76,7 +83,7 @@ Builder.load_string('''
             background_normal: 'img/cellcounterconfocal.png'
             # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
-            border: 0,100,0,100
+            border: 0,0,0,0
             font_size: 40
             bold: True
             italic: True
@@ -89,7 +96,7 @@ Builder.load_string('''
             background_normal: 'img/cellcounterlight.png'
             # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
-            border: 0,100,0,100
+            border: 0,0,0,0
             font_size: 40
             bold: True
             italic: True
@@ -97,12 +104,12 @@ Builder.load_string('''
         Button:
             color: 0,0,0,1
             size_hint_y: 0.5
-            text: 'Anomaly\\ndetection'
+            text: 'Infection'
             on_press: root.manager.current = 'part3'
-            background_normal: 'img/infection.png'
+            background_normal: 'img/penicillin2.png'
             # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
-            border: 0,100,0,100
+            border: 0,0,0,0
             font_size: 40
             bold: True
             italic: True
@@ -110,12 +117,12 @@ Builder.load_string('''
         Button:
             color: 0,0,0,1
             size_hint_y: 0.5
-            text: 'Sholl analysis'
+            text: 'Morphology'
             on_press: root.manager.current = 'part3'
             background_normal: 'img/morphology.png'
             # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
-            border: 0,100,0,100
+            border: 0,0,0,0
             font_size: 40
             bold: True
             italic: True
@@ -123,12 +130,12 @@ Builder.load_string('''
         Button:
             color: 0,0,0,1
             size_hint_y: 0.5
-            text: '  Cell size\\nhistogram'
+            text: 'Confluency'
             on_press: root.manager.current = 'part3'
             background_normal: 'img/confluency.png'
             # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
-            border: 0,100,0,100
+            border: 0,0,0,0
             font_size: 40
             bold: True
             italic: True
@@ -136,10 +143,12 @@ Builder.load_string('''
         Button:
             size_hint_y: 0.5
             text: 'Exit'
+            color: 0,0,0,1
             on_press: root.exit()
+            background_color: 255,255,255,.9
             background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
-            border: 0,100,0,100
+            border: 0,0,0,0
             font_size: 40
             bold: True
             italic: True
@@ -566,7 +575,7 @@ class MainApp(App):
 # build app
     def build(self):
         self.title = 'Cell Counter'
-        self.icon = 'img/Logo.png'
+        self.icon = 'img/logo.png'
         MainApp.sm.add_widget(Logo(name='logo'))
         MainApp.sm.add_widget(Menu(name='menu'))
         MainApp.sm.add_widget(Container1(name='part1'))
