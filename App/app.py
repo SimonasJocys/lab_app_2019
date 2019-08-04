@@ -138,7 +138,7 @@ Builder.load_string('''
             text: 'Exit'
             color: 0,0,0,1
             on_press: root.exit()
-            background_color: 255,255,255,.7
+            background_color: 255,255,255,.9
             background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
             border: 0,0,0,0
