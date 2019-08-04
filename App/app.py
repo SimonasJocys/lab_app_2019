@@ -22,6 +22,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, RiseInTransition
 from kivy.graphics.texture import Texture
+from kivy.uix.slider import Slider
 
 from kivy.clock import Clock
 from functools import partial
@@ -53,15 +54,27 @@ Builder.load_string('''
 
 # ----------------------------------- MENU -----------------------------------
 <Menu>:
+# background color
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, .1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+# Menu buttons
     GridLayout:
-        cols2: 2
+        cols: 2
         rows: 3
+        padding: 50, 30
+        spacing: 100, 30
 # Button for cell count 1
         Button:
+            color: 0,0,0,1
             size_hint_y: 0.5
-            text: 'Cell counter confocal'
+            text: 'Cell counter\\n   confocal'
             on_press: root.manager.current = 'part1'
-            background_normal: 'img/menu.png'
+            background_normal: 'img/cellcounterconfocal.png'
+            # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
             border: 0,100,0,100
             font_size: 40
@@ -69,10 +82,12 @@ Builder.load_string('''
             italic: True
 # Button for cell count 2
         Button:
+            color: 0,0,0,1
             size_hint_y: 0.5
-            text: 'Cell counter light'
+            text: 'Cell counter\\n       light'
             on_press: root.manager.current = 'part2'
-            background_normal: 'img/menu.png'
+            background_normal: 'img/cellcounterlight.png'
+            # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
             border: 0,100,0,100
             font_size: 40
@@ -80,10 +95,12 @@ Builder.load_string('''
             italic: True
 # Button for ...
         Button:
+            color: 0,0,0,1
             size_hint_y: 0.5
-            text: 'Anomaly detection'
+            text: 'Anomaly\\ndetection'
             on_press: root.manager.current = 'part3'
-            background_normal: 'img/menu.png'
+            background_normal: 'img/infection.png'
+            # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
             border: 0,100,0,100
             font_size: 40
@@ -91,10 +108,12 @@ Builder.load_string('''
             italic: True
 # Button for ...
         Button:
+            color: 0,0,0,1
             size_hint_y: 0.5
             text: 'Sholl analysis'
             on_press: root.manager.current = 'part3'
-            background_normal: 'img/menu.png'
+            background_normal: 'img/morphology.png'
+            # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
             border: 0,100,0,100
             font_size: 40
@@ -102,10 +121,12 @@ Builder.load_string('''
             italic: True
 # Button for ...
         Button:
+            color: 0,0,0,1
             size_hint_y: 0.5
-            text: 'Cell size histogram'
+            text: '  Cell size\\nhistogram'
             on_press: root.manager.current = 'part3'
-            background_normal: 'img/menu.png'
+            background_normal: 'img/confluency.png'
+            # background_normal: 'img/menu.png'
             background_down: 'img/menu_press.png'
             border: 0,100,0,100
             font_size: 40
@@ -138,13 +159,52 @@ Builder.load_string('''
         size_hint_x: 1
         padding: 30
         spacing: 20
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 1
 # Selected Image
-        Image:
-            id: img_con
-            source: root.select_img()
-            allow_stretch: False
-            pos_hint: {'center_x': .5}
-# Button: menu
+            Image:
+                id: img_con
+                source: root.select_img()
+                allow_stretch: False
+                pos_hint: {'center_x': .5}
+# Slider 1
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: .2
+                Label:
+                    color: 0,0,0,1
+                    text: '  binary\\ntreshold' # 'min_size'
+                Slider:
+                    id: slider_treshold
+                    min: 0
+                    max: 1
+                    step: 0.01
+                    value: .46
+                    color: 0,0,0,1
+                    orientation: 'vertical'
+                Label:
+                    color: 0,0,0,1
+                    text: '{:.2f}'.format(slider_treshold.value)
+# Slider 2
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: .2
+                Label:
+                    color: 0,0,0,1
+                    text: 'min\\nsize'
+                Slider:
+                    id: slider_size
+                    min: 16
+                    max: 300
+                    step: 1
+                    value: 16
+                    color: 0,0,0,1
+                    orientation: 'vertical'
+                Label:
+                    color: 0,0,0,1
+                    text: '{}'.format(slider_size.value)
+# Button: count
         Button:
             size_hint: .5, .3
             text: 'Count'
@@ -217,9 +277,7 @@ Builder.load_string('''
                 background_normal: 'img/btn_black.png'
                 background_down: 'img/btn_press.png'
                 background_disabled_normal: 'img/btn_dis.png'
-                on_press: 
-                    root.chech()
-                    root.manager.current = 'part1'
+                on_press: root.manager.current = 'part1'
                 border: 0,0,0,0
                 color: 1,1,1,1
             Button:
@@ -333,8 +391,10 @@ class Container1(Screen):
 
     def count_cells(self):
         cell = np.asarray(cv2.imread(self.img)[:,:,0], dtype=np.float32)
-        binary_treshold = 0.46
-        min_size = 16 # 16 px area is minimal
+        binary_treshold = self.ids.slider_treshold.value
+        min_size = self.ids.slider_size.value
+        # binary_treshold = 0.46
+        # min_size = 16 # 16 px area is minimal
         # Binary tresholded image
         clean_cell_bw = remove_small_objects(
                     self.binary_mask(cell, binary_treshold), min_size = min_size)
@@ -350,24 +410,10 @@ class Container1(Screen):
         self.texture.blit_buffer(image.tostring(), colorfmt='rgba', bufferfmt='ubyte')
 
 class Count_screen(Screen):
-    def chech(self):
-        print(self.ids.img_confocal.size)
-        print(self.ids.img_count.size)
-    # def make_img(self):
-    #     # create image 
-    #     self.img = np.random.choice(App.get_running_app().confocal)
-    #     labeled = cv2.imread(self.img)
-    #     image = np.rot90(np.swapaxes(labeled, 0, 1))
-    #     self.texture = Texture.create(size=(image.shape[1], image.shape[0]), colorfmt='rgb')
-    #     self.texture.blit_buffer(image.tostring(), colorfmt='bgr', bufferfmt='ubyte')
-    #     # texture = Texture.create(size=labeled.shape[:2])
-    #     # # buf = np.reshape(labeled, -1)
-    #     # # arr = array('B', buf)
-    #     # # self.texture = texture.blit_buffer(arr, colorfmt='rgb', bufferfmt='ubyte')
-    #     # # self.size = labeled.shape[:2]
-    #     # data = labeled.ravel()
-    #     # self.texture = texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
-    #     return self.texture
+    pass
+    # def chech(self):
+    #     print(self.ids.img_confocal.size)
+    #     print(self.ids.img_count.size)
 # ----------------------------------------------------------------------------
 
 # ---------------------------------- Part 2 ----------------------------------
