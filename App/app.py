@@ -44,11 +44,18 @@ Builder.load_string('''
 
 # ----------------------------------- LOGO -----------------------------------
 <Logo>:
+# background color
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 # Label: welcome
     BoxLayout:
         orientation: 'vertical'
         Image_btn:
-            source: 'img/Logo.png'
+            source: 'img/logo.png'
             allow_stretch: True
             on_press: root.manager.current = 'menu'
 
@@ -57,7 +64,7 @@ Builder.load_string('''
 # background color
     canvas.before:
         Color:
-            rgba: 1, 1, 1, .1
+            rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
@@ -568,7 +575,7 @@ class MainApp(App):
 # build app
     def build(self):
         self.title = 'Cell Counter'
-        self.icon = 'img/Logo.png'
+        self.icon = 'img/logo.png'
         MainApp.sm.add_widget(Logo(name='logo'))
         MainApp.sm.add_widget(Menu(name='menu'))
         MainApp.sm.add_widget(Container1(name='part1'))
