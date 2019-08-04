@@ -240,10 +240,12 @@ Builder.load_string('''
         BoxLayout:
             orientation: 'vertical'
             spacing: 20
+            padding: 100, 10
 # Selected Image
             Image:
                 id: img_confocal
-                allow_stretch: False
+                keep_ratio: False
+                allow_stretch: True
 # Counted Image
             Image: 
                 id: img_count
@@ -303,14 +305,141 @@ Builder.load_string('''
             size: self.size
     BoxLayout:
         orientation: 'vertical'
+        size_hint_x: 1
+        padding: 30
+        spacing: 20
         BoxLayout:
+            orientation: 'horizontal'
             size_hint_y: 1
-# Button: menu
+# Selected Image
+            Image:
+                id: img_l
+                source: 'data/input.png'
+                allow_stretch: False
+                pos_hint: {'center_x': .5}
+# Slider 1
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: .2
+                Label:
+                    color: 0,0,0,1
+                    text: '  binary\\ntreshold'
+                Slider:
+                    id: slider_treshold2
+                    min: 0
+                    max: 1
+                    step: 0.01
+                    value: .42
+                    color: 0,0,0,1
+                    orientation: 'vertical'
+                Label:
+                    color: 0,0,0,1
+                    text: '{:.2f}'.format(slider_treshold2.value)
+# Slider 2
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: .2
+                Label:
+                    color: 0,0,0,1
+                    text: 'min\\nsize'
+                Slider:
+                    id: slider_size_min
+                    min: 16
+                    max: 300
+                    step: 1
+                    value: 120
+                    color: 0,0,0,1
+                    orientation: 'vertical'
+                Label:
+                    color: 0,0,0,1
+                    text: '{}'.format(slider_size_min.value)
+# Slider 3
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: .2
+                Label:
+                    color: 0,0,0,1
+                    text: 'max\\nsize'
+                Slider:
+                    id: slider_size_max
+                    min: 900
+                    max: 6000
+                    step: 10
+                    value: 1800
+                    color: 0,0,0,1
+                    orientation: 'vertical'
+                Label:
+                    color: 0,0,0,1
+                    text: '{}'.format(slider_size_max.value)
+# Button: count
+        Button:
+            size_hint: .5, .3
+            text: 'Count'
+            font_size: 30
+            background_normal: 'img/btn_black.png'
+            background_down: 'img/btn_press.png'
+            background_disabled_normal: 'img/btn_dis.png'
+            on_press: root.manager.current = 'count2'
+            border: 0,0,0,0
+            color: 1,1,1,1
+            pos_hint: {'center_x': .5}
+# Count cells
+<Count_screen2>:
+# background color
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 0.85
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: 1
+        padding: 10
+        spacing: 10
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 20
+# Selected Image
+            Image:
+                id: img_light
+                source: 'data/input.png'
+                allow_stretch: False
+# Counted Image
+            Image: 
+                id: img_count2
+                source: 'data/output.png'
+                allow_stretch: False
+# Buttons
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x: .3
+            spacing: 20
+            Label:
+                id: number2
+                text: 'Number of \\nCells: 66'
+                font_size: 30
+                bold: True
+                italic: True
+                color: 0.15, 0.8, 0.3, 1
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 0.7
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
             Button:
-                # size_hint_x: 1
-                size_hint: None, None
-                width: 200
-                id: btn_menu
+                size_hint_y: .3
+                text: 'Next'
+                font_size: 30
+                background_normal: 'img/btn_black.png'
+                background_down: 'img/btn_press.png'
+                background_disabled_normal: 'img/btn_dis.png'
+                on_press: root.manager.current = 'part2'
+                border: 0,0,0,0
+                color: 1,1,1,1
+            Button:
+                size_hint_y: .3
                 text: 'Menu'
                 font_size: 30
                 background_normal: 'img/btn_black.png'
@@ -419,6 +548,8 @@ class Count_screen(Screen):
 # ---------------------------------- Part 2 ----------------------------------
 class Container2(Screen):
     pass
+class Count_screen2(Screen):
+    pass
 # ----------------------------------------------------------------------------
 
 # ---------------------------------- Part 3 ----------------------------------
@@ -436,12 +567,12 @@ class MainApp(App):
     def build(self):
         self.title = 'Cell Counter'
         self.icon = 'img/Logo.png'
-        MainApp.sm.add_widget(Container1(name='part1'))
         MainApp.sm.add_widget(Logo(name='logo'))
         MainApp.sm.add_widget(Menu(name='menu'))
-        # MainApp.sm.add_widget(Container1(name='part1'))
+        MainApp.sm.add_widget(Container1(name='part1'))
         MainApp.sm.add_widget(Count_screen(name='count'))
         MainApp.sm.add_widget(Container2(name='part2'))
+        MainApp.sm.add_widget(Count_screen2(name='count2'))
         MainApp.sm.add_widget(Container3(name='part3'))
         return MainApp.sm
 
